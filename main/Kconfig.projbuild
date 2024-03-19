@@ -1,0 +1,90 @@
+menu "Shop Air Monitor (S.A.M.) Configuration"
+
+    orsource "$IDF_PATH/examples/common_components/env_caps/$IDF_TARGET/Kconfig.env_caps"
+
+    config UPDATE_MS
+        int "Update period in ms"
+        range 10 3600000
+        default 1000
+        help
+            Define the length of time between display updates in milliseconds.
+
+    config UART_RX_PIN
+        int "UART RX (data input) pin"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 44
+
+    config I2C_SDA_PIN
+        int "I2C SDA (serial data) pin"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 8
+
+    config I2C_SCL_PIN
+        int "I2C SCL (serial clock) pin"
+        range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+        default 9
+
+    menu "Status LED"
+
+        config STATUS_LED_POWER_PIN
+            int "Status LED power pin"
+            range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+            default 17
+            help
+                Power pin for the status LED. Will always be enabled after startup.
+
+        config STATUS_LED_RESOLUTION_MHZ
+            int "Status LED update resolution in MHz"
+            range 1 100
+            default 10
+
+        config STATUS_LED_DATA_PIN
+            int "Status LED color data pin"
+            range ENV_GPIO_RANGE_MIN ENV_GPIO_OUT_RANGE_MAX
+            default 18
+
+    endmenu
+
+    menu "Air Quality Sensor"
+
+        config AQS_UART_PORT
+            int "Sensor UART port"
+            range 0 2
+            default 2 
+
+        config AQS_BAUD_RATE
+            int "Sensor baud rate"
+            range 1200 115200
+            default 115200
+
+        config AQS_WAIT_MS
+            int "Sensor wait period in ms"
+            range 10 3600000
+            default 20
+            help
+                How long to wait for the air quality sensor to send data before throwing a warning.
+
+    endmenu
+
+    menu "SSD1306 OLED"
+
+        config OLED_I2C_ADDRESS
+            hex "Display I2C address"
+            range 0x01 0x80
+            default 0x3D
+
+        config OLED_CLOCK_SPEED
+            int "Display clock speed in MHz"
+            range 1 100
+            default 1
+
+        config OLED_WAIT_MS
+            int "Display wait period in ms"
+            range 10 3600000
+            default 20
+            help
+                How long to wait for the OLED to acknowledge sent data before throwing a warning.
+
+    endmenu
+
+endmenu
