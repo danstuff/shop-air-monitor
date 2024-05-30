@@ -52,6 +52,8 @@ typedef struct _lstate_t
 
 static lstate_t lstate = { 0 };
 
+//#define ENABLE_OLED
+
 #ifdef ENABLE_OLED
 static const uint8_t oled_bkg[] =
 {
@@ -68,11 +70,11 @@ static uint8_t oled_write(uint8_t* data, size_t data_len)
     i2c_master_write(i2c_cmd, data, data_len, true);
     i2c_master_stop(i2c_cmd);
 
-    esp_err_t write_err = i2c_master_cmd_begin(
-            I2C_NUM_0, i2c_cmd, CONFIG_OLED_WAIT_MS / portTICK_PERIOD_MS);
+    ESP_ERROR_CHECK(i2c_master_cmd_begin(
+            I2C_NUM_0, i2c_cmd, CONFIG_OLED_WAIT_MS / portTICK_PERIOD_MS));
 
     i2c_cmd_link_delete(i2c_cmd);
-    return write_err;
+    return 0;
 }
 
 static void update(void)
@@ -83,18 +85,21 @@ static void update(void)
     int in_packet_len = uart_read_bytes(
             CONFIG_AQS_UART_PORT, 
             in_packet,
-            sizeof(in_packet)-1,
+            sizeof(in_packet),
             CONFIG_AQS_WAIT_MS / portTICK_PERIOD_MS);
 
     if (in_packet_len > 0)
     {
-        in_packet[in_packet_len] = '\0';
-        log("Got AQS data '%s'", (char*)in_packet);
+        log("Got AQS data");
+        for (int i = 0; i < in_packet_len; i++)
+        {
+            log("%x", in_packet[i]);
+        }
         /* TODO convert AQS data and put it in lstate.kparticles[] */
     }
     else
     {
-        log("[WARN] Got no AQS data");
+        log("[WARN] Got no AQS data %i", in_packet_len);
         status = STATUS_CODE_NO_IN;
     }
 
